@@ -126,31 +126,25 @@ The effects of these cleaning steps were to create several new numerical columns
 
 We can look into the ratings column to see how it is distributed: 
 
-<div style="display: flex; justify-content: center; align-items: center; height: 100%; padding: 20px;">
-    <iframe
-    src="assets/ratings_histogram.html"
-    width="800"
-    height="600"
-    frameborder="0"
-    ></iframe>
-</div>
+<iframe src="assets/ratings_histogram.html" width="800" height="600" frameborder="0"></iframe>
 
-It seems that the vast majority of ratings are 5 star ratings. This is not super surprising as many online recipes end up being good, and many people who review recipes do not review them with an intense amount of scrutiny. There still are a small amount of reviews that are below 5 stars, though.
+It seems that the vast majority of ratings are 5 star ratings. This is not super surprising as many online recipes end up being good, and many people who review recipes do not review them with an intense amount of scrutiny. This may make predicting a "good" recipe more difficult - we may have to come up with different definitons of what it means to be a "good" recipe. There still are a small amount of reviews that are below 5 stars, though, meaning that it might be possible to make predictions solely off of these ratings.
 
 #### Distribution of nutritional information
 
-Many of the new columns that were derived from the original `'nutrition'` column share the same units of percent daily value (PDV). Given this, it makes sense to visualize the distributions of these columns in a side by side box plot. Since there is a very large spread in potential values, I will display the distribution of log('nutritional value PDV').
+Many of the new columns that were derived from the original `'nutrition'` column share the same units of percent daily value (PDV). Given this, it makes sense to visualize the distributions of these columns in a side by side box plot. 
 
-<div style="display: flex; justify-content: center; align-items: center; height: 100%; padding: 20px;">
-    <iframe
-    src="assets/nutrition_boxplots.html"
-    width="800"
-    height="600"
-    frameborder="0"
-    ></iframe>
-</div>
+<iframe src="assets/nutrition_boxplots.html" width="800" height="600" frameborder="0"></iframe>
+
+There is an immense amount of variation in nutrient PDV values amongst different recipes. I have log transformed PDV on the y-axis to make a more interpretable boxplot, but this spread will need to be accounted for in subsequent model building.
 
 ### Bivariate Analysis
+
+We can also conduct a multivariate analysis by looking at the relationship between two variables and coloring by a third. I will look at the relationship between calorie number and average rating, coloring by recipe duration. 
+
+<iframe src="assets/recipe_avg_cal_num_scatterplot.html" width="800" height="600" frameborder="0"></iframe>
+
+There doesnt seem to be an incredibly strong relationship between any of these three variables. There might be a slightly positive relationship between calorie number and recipe rating, so that could be used as a predictor in an initial model. 
 
 ### Interesting Aggregates
 
