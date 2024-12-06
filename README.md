@@ -126,7 +126,7 @@ The effects of these cleaning steps were to create several new numerical columns
 
 We can look into the ratings column to see how it is distributed: 
 
-<iframe src="assets/ratings_histogram.html" width="800" height="600" frameborder="0"></iframe>
+<iframe src="assets/ratings_histogram.html" width="800" height="600" frameBorder=0></iframe>
 
 It seems that the vast majority of ratings are 5 star ratings. This is not super surprising as many online recipes end up being good, and many people who review recipes do not review them with an intense amount of scrutiny. This may make predicting a "good" recipe more difficult - we may have to come up with different definitons of what it means to be a "good" recipe. There still are a small amount of reviews that are below 5 stars, though, meaning that it might be possible to make predictions solely off of these ratings.
 
@@ -134,15 +134,15 @@ It seems that the vast majority of ratings are 5 star ratings. This is not super
 
 Many of the new columns that were derived from the original `'nutrition'` column share the same units of percent daily value (PDV). Given this, it makes sense to visualize the distributions of these columns in a side by side box plot. 
 
-<iframe src="assets/nutrition_boxplots.html" width="800" height="600" frameborder="0"></iframe>
+<iframe src="assets/nutrition_boxplots.html" width="800" height="600" frameBorder=0></iframe>
 
-There is an immense amount of variation in nutrient PDV values amongst different recipes. I have log transformed PDV on the y-axis to make a more interpretable boxplot, but this spread will need to be accounted for in subsequent model building.
+There is an immense amount of variation in nutrient PDV values. In order to make a more interpretable boxplot, I plotted the y-axis of PDV values on the log scale. This spread will need to be accounted for in subsequent model building.
 
 ### Bivariate Analysis
 
 We can also conduct a multivariate analysis by looking at the relationship between two variables and coloring by a third. I will look at the relationship between calorie number and average rating, coloring by recipe duration. 
 
-<iframe src="assets/recipe_avg_cal_num_scatterplot.html" width="800" height="600" frameborder="0"></iframe>
+<iframe src="assets/recipe_avg_cal_num_scatterplot.html" width="900" height="700" frameBorder=0></iframe>
 
 There doesnt seem to be an incredibly strong relationship between any of these three variables. There might be a slightly positive relationship between calorie number and recipe rating, so that could be used as a predictor in an initial model. 
 
