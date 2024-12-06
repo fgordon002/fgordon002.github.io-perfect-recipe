@@ -126,12 +126,14 @@ The effects of these cleaning steps were to create several new numerical columns
 
 We can look into the ratings column to see how it is distributed: 
 
-<iframe
-  src="assets/ratings_histogram.html"
-  width="800"
-  height="600"
-  frameborder="0"
-></iframe>
+<div style="display: flex; justify-content: center; align-items: center; height: 100%; padding: 20px;">
+    <iframe
+    src="assets/ratings_histogram.html"
+    width="800"
+    height="600"
+    frameborder="0"
+    ></iframe>
+</div>
 
 It seems that the vast majority of ratings are 5 star ratings. This is not super surprising as many online recipes end up being good, and many people who review recipes do not review them with an intense amount of scrutiny. There still are a small amount of reviews that are below 5 stars, though.
 
@@ -139,12 +141,14 @@ It seems that the vast majority of ratings are 5 star ratings. This is not super
 
 Many of the new columns that were derived from the original `'nutrition'` column share the same units of percent daily value (PDV). Given this, it makes sense to visualize the distributions of these columns in a side by side box plot. Since there is a very large spread in potential values, I will display the distribution of log('nutritional value PDV').
 
-<iframe
-  src="assets/nutrition_boxplots.html"
-  width="800"
-  height="600"
-  frameborder="0"
-></iframe>
+<div style="display: flex; justify-content: center; align-items: center; height: 100%; padding: 20px;">
+    <iframe
+    src="assets/nutrition_boxplots.html"
+    width="800"
+    height="600"
+    frameborder="0"
+    ></iframe>
+</div>
 
 ### Bivariate Analysis
 
