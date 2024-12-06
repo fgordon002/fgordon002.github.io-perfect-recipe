@@ -1,16 +1,24 @@
 # Predicting the Perfect Recipe
 
-Final homework assignment for EECS 398 at the University of Michigan
+by Finley Gordon (fgordon@umich.edu)
 
 ---
 
 ## Introduction 
 
+---
+
 ## Data Cleaning and Exploratory Data Analysis
+
+---
 
 ## Framing a Prediction Problem
 
+---
+
 ## Baseline Model
+
+---
 
 ## Final Model
 
