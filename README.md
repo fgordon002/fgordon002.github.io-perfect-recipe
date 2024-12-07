@@ -293,7 +293,7 @@ Combining these three metrics will help us understand what the best possible mod
 
 ### One Versus Rest Model
 
-The first model I will use for this prediction problem is a **one versus rest logistic regression model** in which there are five seperate logistic regression models created, each one being a binary logistic regression model for each rating category. More specifically, this model will contain five sub-models, the first predicting whether or not a review gives a recipe a rating of 1 or not, the second predicting whether or not a review gives a recipe a rating of 2, etc. Based on the exploratory data analysis above, I decided to use four features as predictors in this initial model: `'minutes'`, `'calories_number'`, `'total_fat_PDV'`, and `'sodium_PDV'`. I performed a train test split, using 75% of my data to train the model and the remaining 25% to test it. After model training, I computed the model accuracy, recall, and precision on the test data. Since this was a multi class classification model, I couldn't compute recall and precision directly; instead I averaged it over the 5 models. The model had these metrics:
+The first model I will use for this prediction problem is a **one versus rest logistic regression model** in which there are five seperate logistic regression models created, each one being a binary logistic regression model for each rating category. More specifically, this model will contain five sub-models, the first predicting whether or not a review gives a recipe a rating of 1 or not, the second predicting whether or not a review gives a recipe a rating of 2, etc. Based on the exploratory data analysis above, I decided to use four features as predictors in this initial model: `'minutes'`, `'calories_number'`, `'total_fat_PDV'`, and `'sodium_PDV'`. These are all quantitative continuous features. I performed a train test split, using 75% of my data to train the model and the remaining 25% to test it. After model training, I computed the model accuracy, recall, and precision on the test data. Since this was a multi class classification model, I couldn't compute recall and precision directly; instead I averaged it over the 5 models. The model had these metrics:
 
 - **accuracy**: 0.7726
 - **average recall**: 0.2
@@ -305,21 +305,84 @@ Despite having high accuracy, the model displayed poor average recall and precis
     <img src="assets\confusion_matrix_m1.png" alt="Confusion Matrix" width="600">
 </body>
 
-Per the confusion matrix, the one versus rest classifier is classifying everything as rated a 5! This is not entirely surprising given the extreme bias in 5 ratings as seen before. This underlying distribution might not be condusive to a good model; we might need to reframe the prediction question.
+Per the confusion matrix, the one versus rest classifier is classifying everything as rated a 5! This is not entirely surprising given the extreme bias in 5 ratings as seen before. This model is clearly uninformative, and might not be able to be made better due to the underlying distribution of what its trying to predict; we might need to reframe the prediction question.
 
 ### Binary Logistic Regression model
+
+Thus far, this analysis has been motivated by the question "can we predict if a review will rate a recipe highly?", and we have unsuccessfuly been able to do so. This question is motivated by a desire to understand what about recipes makes them get good reviews. Unfortunately almost all recipes get good reivews, making this a very difficult classification problem due to the eagerness of people to rate something five stars. There are still reviews below five stars, though, and there are many recipes rated multiple times, allowing us to generate the `'avg_rating'` column earlier. It might make sense to bin recipes as in the top 50% or bottom 50% of average ratings, and try to predict that feature instead. The prediction question now becomes: **"can we classify an above average recipe based on its features?**.
+
+This is a question best answered by a binary logistic regression model. We can create a new column, `'above_median_avg_rating'` which stores `True` or `False` values describing whether or not a given **recipe** (note we are no longer predicting reviews) is above the median in its average rating. I will create a new binary logistic regression model predicting this feature, based on the same columns as before: `'minutes'`, `'calories_number'`, `'total_fat_PDV'`, and `'sodium_PDV'`. The new model had these quality metrics:
+
+- **accuracy**: 0.5221
+- **recall**: 0.2016
+- **precision**: 0.5380
+
+We can see the confusion matrix for this model as well:
+
+<body>
+    <img src="assets\confusion_matrix_m2.png" alt="Confusion Matrix 2" width="600">
+</body>
+
+This model does not perform very well and certainly overclassifies recipes as being in the bottom 50%, but it does seem to make more varied predictions so maybe it is worth building upon as a final model.
 
 ---
 
 ## Final Model
 
-### Standard Scaling
+For my final model, I will build upon the binary logistic regression model that predicts whether or not a recipe will register an average score in the top 50% of average scores.
 
-### Dropping and adding features
+### Feature Engineering
 
-### TF-IDF 
+#### Standard Scaling
+
+The first improvement I made to this model was to apply a standard scalar transformation to all of the variables. As shown before, all four of the predictors `'minutes'`, `'calories_number'`, `'total_fat_PDV'`, and `'sodium_PDV'` had extreme ranges of values, and some of them are not in the same units as the others. To put all predictor variables on the same scale and ensure that they have a mean of 0 and a variance of 1, I applied this transformation. The resulting model had these quality metrics:
+
+- **accuracy**: 0.5221
+- **recall**: 0.2010
+- **precision**: 0.5382
+
+The model did not seem to improve much at all. This isn't incredibly surprising as standard scaling is useful for coefficient interpretations but does not add any new information to the model - all scaled features contain the same information as their inital values, but are not just on a different scale. 
+
+#### Dropping and Adding Features
+
+To actually try and improve on the model, I decided to swap out some features. `'calories_number'` had a coefficient of zero, indicating that it was not adding any information to the model, so I dropped this variable. I also decided to add `'protein_PDV'` after inspecting the averages of this variables for the two `'above_median_avg_rating'` categoreies. The new model predicted `'above_median_avg_rating'` based on `'minutes'`, `'total_fat_PDV'`, `'sodium_PDV'`, and `'protein_PDV'` after applying a standard scalar to all of these predictors. The resulting model quality metrics were:
+
+- **accuracy**: 0.5313
+- **recall**: 0.5156
+- **precision**: 0.5240
+
+It seems that the new model is decently improved in terms of its precision with minimal change elsewhere. I decided to keep all of these predictors from this point forward.
+
+#### TF-IDF 
+
+The final feature engineering attempt I made was to try and utilize the text information in the `'tags'`, `'steps'`, and `'ingredients'` columns. Each recipe has its own unique list of items for each of these columns, so I wanted to see if I could extract meaningful information from this text by applying TF-IDF to each column. I created a pipeline in which a column could be converted into a list in order for `TFidfVectorizer()` to be applied. `TFidfVectorizer()` outputs a matrix in which each row corresponds to one recipe and each column corresponds to a word in that recipes `'tags'`, `'steps'`, or `'ingredients'`. The values are the TF-IDF scores that were generated for each word in each document (recipe) using all of the recipes `'tags'`, etc. values as a corpus. In order to summarize each column for each recipe, as a last step in the pipeline  summed across the columns of the TF-IDF matrix outputted by `TFidfVectorizer()`. In short, the pipeline took in a text column and returned a list of unique values for each recipe corresponding to that recipes summed TF-IDF score for a given column. 
+
+I applied this pipeline to the `'tags'`, `'steps'`, and `'ingredients'` columns, and then created a model that predicted `'above_median_avg_rating'` based on `'minutes'`, `'total_fat_PDV'`, `'sodium_PDV'`, `'protein_PDV'`, and the TF-IDF scores for `'tags'`, `'steps'`, and `'ingredients'` that were outlined above. The resulting model had these quality metrics:
+
+- **accuracy**: 0.5282
+- **average recall**: 0.4570
+- **average precision**: 0.5234
+
+Unfortunately, these new features did not seem to improve the model at all and in fact made the recall worse. This means that the model was slightly more underfit to the data as it had in increased false negative rate. I had initially thought that recipes in the top 50% of average scores might have higher TF-IDF scores for some of the columns with text data (indicating "more important" information in these columns). It does not look like that is the case, though, and so I did not include TF-IDF in my final model.
 
 ### Cross Validation
 
+It seems like the model predicting `'above_median_avg_rating'` based on `'minutes'`, `'total_fat_PDV'`, `'sodium_PDV'`, and `'protein_PDV'` performed the best out of all of the different models tried. As a final step in the model building process, I will perform hyperparamater tuning on this model to choose the best value of "C" in the regression model. Regularized logistic regression models are fit by minimizing the regularized loss funciton:
+
+$$R_\text{ce-reg}(\vec{w}) - \frac{1}{n} \sum_{i = 1}^n \left[ y_i \log \left( \sigma \left(\vec{w} \cdot \text{Aug}(\vec{x}_i) \right) \right)  + (1 - y_i) \log \left(1 - \sigma\left(\vec{w} \cdot \text{Aug}(\vec{x}_i) \right)\right) \right] + \frac{1}{C} \sum_{j = 1}^d w_j^2$$
+
+"C" is a hyperparameter in this loss function that can be tuned to restrict coefficient magnitudes (small C) or relax restrictions on coefficient magnitudes (large C). After k-fold cross validation on values of `C = [0.01, 0.1, 1, 10, 100]`, I found `C = 10` to be the best hyperparameter value. The final model had these quality metrics:
+
+- **accuracy**: 0.5313
+- **recall**: 0.5156
+- **precision**: 0.5240
+
+With a confusion matrix of:
+
+<body>
+    <img src="assets\confusion_matrix_m3.png" alt="Confusion Matrix 3" width="600">
+</body>
+
 ## Conclusion
 
+In conclusion, the final model didn't predict whether or not a new recipe would have an average score in the top 50% of average scores very well. In fact, it did not do much better than random chance. This could indicate that the features in the dataset do not strongly relate to the average score. It could also have something to do with the fact that score was such a heavily skewed variable in the first place. Predicting the perfect recipe - or even an above average recipe - proved to be something quite difficult to do based on these data. Maybe, though, it is simply because the majority of recipes are perfect to begin with.
