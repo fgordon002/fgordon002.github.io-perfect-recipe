@@ -126,8 +126,9 @@ The effects of these cleaning steps were to create several new numerical columns
 
 We can look into the ratings column to see how it is distributed: 
 
-<iframe src="assets/ratings_histogram.html" width=800 height=600 frameBorder=0></iframe>
-
+<div style="display: flex; justify-content: center; align-items: center; height: 100vh;">
+    <iframe src="assets/ratings_histogram.html" width=1000 height=800 frameBorder=0></iframe>
+</div>
 It seems that the vast majority of ratings are 5 star ratings. This is not super surprising as many online recipes end up being good, and many people who review recipes do not review them with an intense amount of scrutiny. This may make predicting a "good" recipe more difficult - we may have to come up with different definitons of what it means to be a "good" recipe. There still are a small amount of reviews that are below 5 stars, though, meaning that it might be possible to make predictions solely off of these ratings.
 
 #### Distribution of nutritional information
@@ -379,9 +380,9 @@ $$R_\text{ce-reg}(\vec{w}) - \frac{1}{n} \sum_{i = 1}^n \left[ y_i \log \left( \
 
 With a confusion matrix of:
 
-<body>
+<div style="text-align: center;">
     <img src="assets\confusion_matrix_m3.png" alt="Confusion Matrix 3" width="600">
-</body>
+</div>
 
 ## Conclusion
 
