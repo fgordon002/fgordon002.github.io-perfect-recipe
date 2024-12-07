@@ -150,7 +150,7 @@ There doesnt seem to be an incredibly strong relationship between any of these t
 
 In order to better understand how the numerical features in the dataset are represented in different rating classes, we can group by rating and summarize each numerical column by displaying its mean. The following table displays information pertaining to the mean of each numerical column for each distinct rating class (1-5).
 
-<div style="overflow-x:auto;"">
+<div style="overflow-x:auto;">
     <table>
       <thead>
         <tr>
