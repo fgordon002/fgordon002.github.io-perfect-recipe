@@ -126,16 +126,15 @@ The effects of these cleaning steps were to create several new numerical columns
 
 We can look into the ratings column to see how it is distributed: 
 
-<div style="display: flex; justify-content: center; align-items: center; height: 100vh;">
-    <iframe src="assets/ratings_histogram.html" width=1000 height=800 frameBorder=0></iframe>
-</div>
+<iframe src="assets/ratings_histogram.html" width=600 height=400 frameBorder=0></iframe>
+
 It seems that the vast majority of ratings are 5 star ratings. This is not super surprising as many online recipes end up being good, and many people who review recipes do not review them with an intense amount of scrutiny. This may make predicting a "good" recipe more difficult - we may have to come up with different definitons of what it means to be a "good" recipe. There still are a small amount of reviews that are below 5 stars, though, meaning that it might be possible to make predictions solely off of these ratings.
 
 #### Distribution of nutritional information
 
 Many of the new columns that were derived from the original `'nutrition'` column share the same units of percent daily value (PDV). Given this, it makes sense to visualize the distributions of these columns in a side by side box plot. 
 
-<iframe src="assets/nutrition_boxplots.html" width=800 height=600 frameBorder=0></iframe>
+<iframe src="assets/nutrition_boxplots.html" width=600 height=400 frameBorder=0></iframe>
 
 There is an immense amount of variation in nutrient PDV values. In order to make a more interpretable boxplot, I plotted the y-axis of PDV values on the log scale. This spread will need to be accounted for in subsequent model building.
 
@@ -143,7 +142,7 @@ There is an immense amount of variation in nutrient PDV values. In order to make
 
 We can also conduct a multivariate analysis by looking at the relationship between two variables and coloring by a third. I will look at the relationship between calorie number and average rating, coloring by recipe duration. 
 
-<iframe src="assets/recipe_avg_cal_num_scatterplot.html" width=800 height=600 frameBorder=0></iframe>
+<iframe src="assets/recipe_avg_cal_num_scatterplot.html" width=600 height=400 frameBorder=0></iframe>
 
 There doesnt seem to be an incredibly strong relationship between any of these three variables. There might be a slightly positive relationship between calorie number and recipe rating, so that could be used as a predictor in an initial model. 
 
@@ -302,9 +301,9 @@ The first model I will use for this prediction problem is a **one versus rest lo
 
 Despite having high accuracy, the model displayed poor average recall and precision. Since these are averages across the five models, this might indicate that the one versus rest classifier is severely over-fitting one sub model and underfitting the rest. We can see if this is the case by plotting a confusion matrix:
 
-<body>
+<div style="text-align: center;">
     <img src="assets\confusion_matrix_m1.png" alt="Confusion Matrix" width="600">
-</body>
+</div>
 
 Per the confusion matrix, the one versus rest classifier is classifying everything as rated a 5! This is not entirely surprising given the extreme bias in 5 ratings as seen before. This model is clearly uninformative, and might not be able to be made better due to the underlying distribution of what its trying to predict; we might need to reframe the prediction question.
 
@@ -320,9 +319,9 @@ This is a question best answered by a binary logistic regression model. We can c
 
 We can see the confusion matrix for this model as well:
 
-<body>
+<div style="text-align: center;">
     <img src="assets\confusion_matrix_m2.png" alt="Confusion Matrix 2" width="600">
-</body>
+</div>
 
 This model does not perform very well and certainly overclassifies recipes as being in the bottom 50%, but it does seem to make more varied predictions so maybe it is worth building upon as a final model.
 
