@@ -8,7 +8,7 @@ by Finley Gordon (fgordon@umich.edu)
 
 This analysis is centered around the Recipes and Ratings dataset, which contains information on recipes and ratings from food.com. The dataset contains 234,429 rows and 12 columns with information about 83,782 unique recipes. There are a larger number of rows than unique recipes in the dataset because each row is a review of a recipe, and some recipes have many reviews. 
 
-My motivation for working with this dataset stems from my love of food - I frequently cook for myself, and often when I want to try something new I use a recipe from a website like food.com. I've certainly cooked some un-reviewed recipes that I wasn't satisfied with before, though, despite how appetizing the picture looked (and I promise I'm a good cook!). Recounting these experiences caused me to wonder: what are the characteristics of an above average recipe? Or, in other words, **can we predict whether or not a recipe will be above average based on its features?** It would be useful to know which characteristics of recipes predict a better than average recipe, and to what degree these characteristics are able to predict this outcome. Such predictive abilities would allow us to have some insight on how a recipe will taste when no one has reviewed it yet. Creating a model that tries to make predictions about recipes in this fashion is the central aim of this analysis. 
+My motivation for working with this dataset stems from my love of food - I frequently cook for myself, and often when I want to try something new I use a recipe from a website like food.com. I've certainly cooked some un-reviewed recipes that I wasn't satisfied with before, though, despite how appetizing the picture looked (and I promise I'm a good cook!). Recounting these experiences caused me to wonder: what are the characteristics of a "good" recipe? Or, in other words, **can we predict a "good" recipe based on its features?** It would be useful to know which characteristics of recipes predict a better than average recipe, and to what degree these characteristics are able to predict this outcome. Such predictive abilities would allow us to have some insight on how a recipe will taste when no one has reviewed it yet. Creating a model that tries to make predictions about recipes in this fashion is the central aim of this analysis. 
 
  To accomplish this aims, I will first clean the dataset and perform some exploratory data analysis before framing my prediction problem more specifically, creating a baseline model, and improving upon this model to create a final model. In order to get us started, I will summarize some of the most relevant columns in the initial Recipes and Ratings dataset that I plan to use.
 
@@ -148,11 +148,121 @@ There doesnt seem to be an incredibly strong relationship between any of these t
 
 ### Interesting Aggregates
 
+In order to better understand how the numerical features in the dataset are represented in different rating classes, we can group by rating and summarize each numerical column by displaying its mean. The following table displays information pertaining to the mean of each numerical column for each distinct rating class (1-5).
+
+<div style="overflow-x:auto;"">
+    <table>
+      <thead>
+        <tr>
+          <th>rating</th>
+          <th>n_recipes</th>
+          <th>avg_minutes</th>
+          <th>avg_steps</th>
+          <th>avg_ingredients</th>
+          <th>avg_cals</th>
+          <th>avg_fat_PDV</th>
+          <th>avg_sugar_PDV</th>
+          <th>avg_sodium_PDV</th>
+          <th>avg_protein_PDV</th>
+          <th>avg_carb_PDV</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>2869</td>
+          <td>92.6699</td>
+          <td>10.6281</td>
+          <td>8.9146</td>
+          <td>486.511</td>
+          <td>37.0683</td>
+          <td>88.0394</td>
+          <td>44.351</td>
+          <td>34.0561</td>
+          <td>16.3845</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>2367</td>
+          <td>91.9793</td>
+          <td>10.6958</td>
+          <td>9.2294</td>
+          <td>446.478</td>
+          <td>32.7486</td>
+          <td>75.1842</td>
+          <td>29.4719</td>
+          <td>34.2738</td>
+          <td>15.0452</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>7169</td>
+          <td>78.088</td>
+          <td>9.99205</td>
+          <td>9.19961</td>
+          <td>425.84</td>
+          <td>31.6414</td>
+          <td>65.5727</td>
+          <td>27.9231</td>
+          <td>34.8625</td>
+          <td>13.6846</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>37288</td>
+          <td>70.3754</td>
+          <td>9.5752</td>
+          <td>9.10124</td>
+          <td>405.072</td>
+          <td>29.9471</td>
+          <td>56.7858</td>
+          <td>26.9398</td>
+          <td>34.0496</td>
+          <td>12.8305</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td>169503</td>
+          <td>71.7583</td>
+          <td>9.98192</td>
+          <td>9.051</td>
+          <td>415.042</td>
+          <td>31.8165</td>
+          <td>63.0646</td>
+          <td>29.1251</td>
+          <td>32.6483</td>
+          <td>13.0159</td>
+        </tr>
+      </tbody>
+    </table>
+</div>
+
+From this summary table, we can see that there exist some small differences between different rating classes in terms of the numerical columns of that dataset. Counter to what I had thought from the scatterplot, it seems that average calorie number actually decreases as rating increases. The same rough trend is true for average sugar and average carb for each rating category, which makes sense as the most sugary and carb heavy recipies would likely have more calories. It might be important to keep this in mind for potential instances of multicollinearity among these columns; if such multicollinearity were present, this may bias the interpretation of model coefficients once we begin building models. Average minutes is also another interesting column that sharply decreases as rating increases. An important thing to note is the sample size for these different categories is quite different, as we saw earlier.
+
 ### Imputation
+
+In terms of imputation, I did not replace any missing values.
 
 ---
 
 ## Framing a Prediction Problem
+
+This analysis is centered around the question: **can we predict a "good" recipe?** Making this into a more tangible prediction probelem requires defining what we mean by "good". A simple definition would be to just follow the rating system: great recipes are those that are rated as 5, good as 4, etc. Predicting a "good" recipe then just amounts to predicting which rating class a recipe will belong to and judging it based on that predicted class. This problem, therefore, can be interpreted as a **classification** problem, and more specifically a **multiclass classification problem**. The response variable is the rating, and we can evaluate our classification models in a variety of ways; mainly we can use accuracy, precision, and recall to describe the quality of the model. 
+
+When making binary classification models, the resulting predictions can fall into one of four categories:
+
+- **True Positive**: model correctly predicts the positive class
+- **False Positive**: model incorrectly predicts the positive class
+- **True Negative**: model correctly predicts the negative class
+- **False negative** model incorrectly predicts the negative class
+
+These categories only exist for binary classification models, but as we'll see in a second, we can formulate a multiclass classification problem in terms of a set of binary classification models. The previous quality metrics are defined as such:
+
+$$\text{accuracy } = \frac{TP + TN}{TP + FP + FN + TN}$$
+$$\text{recall } = \frac{TP}{TP + FN}$$
+$$\text{precision } = \frac{TP}{TP + FP}$$
+
+Combining these three metrics will help us understand what the best possible model is.
 
 ---
 
