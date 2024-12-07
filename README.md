@@ -295,17 +295,13 @@ Combining these three metrics will help us understand what the best possible mod
 
 The first model I will use for this prediction problem is a **one versus rest logistic regression model** in which there are five seperate logistic regression models created, each one being a binary logistic regression model for each rating category. More specifically, this model will contain five sub-models, the first predicting whether or not a review gives a recipe a rating of 1 or not, the second predicting whether or not a review gives a recipe a rating of 2, etc. Based on the exploratory data analysis above, I decided to use four features as predictors in this initial model: `'minutes'`, `'calories_number'`, `'total_fat_PDV'`, and `'sodium_PDV'`. I performed a train test split, using 75% of my data to train the model and the remaining 25% to test it. After model training, I computed the model accuracy, recall, and precision on the test data. Since this was a multi class classification model, I couldn't compute recall and precision directly; instead I averaged it over the 5 models. The model had these metrics:
 
--**accuracy**: 0.7726
--**average recall**: 0.2
--**average precision**: 0.1525
+- **accuracy**: 0.7726
+- **average recall**: 0.2
+- **average precision**: 0.1525
 
 Despite having high accuracy, the model displayed poor average recall and precision. Since these are averages across the five models, this might indicate that the one versus rest classifier is severely over-fitting one sub model and underfitting the rest. We can see if this is the case by plotting a confusion matrix:
 
-<head>
-    <title>Confusion Matrix</title>
-</head>
 <body>
-    <h1>Confusion Matrix for Baseline One Vs Rest Model</h1>
     <img src="assets\confusion_matrix_m1.png" alt="Confusion Matrix" width="600">
 </body>
 
