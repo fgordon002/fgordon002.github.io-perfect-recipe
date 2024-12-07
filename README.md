@@ -8,9 +8,9 @@ by Finley Gordon (fgordon@umich.edu)
 
 This analysis is centered around the Recipes and Ratings dataset, which contains information on recipes and ratings from food.com. The dataset contains 234,429 rows and 12 columns with information about 83,782 unique recipes. There are a larger number of rows than unique recipes in the dataset because each row is a review of a recipe, and some recipes have many reviews. 
 
-My motivation for working with this dataset stems from my love of food - I frequently cook for myself, and often when I want to try something new I use a recipe from a website like food.com. I've certainly cooked some un-reviewed recipes that I wasn't satisfied with before, though, despite how appetizing the picture looked (and I promise I'm a good cook!). Recounting these experiences caused me to wonder: what are the characteristics of a "good" recipe? Or, in other words, **can we predict a "good" recipe based on its features?** It would be useful to know which characteristics of recipes predict a better than average recipe, and to what degree these characteristics are able to predict this outcome. Such predictive abilities would allow us to have some insight on how a recipe will taste when no one has reviewed it yet. Creating a model that tries to make predictions about recipes in this fashion is the central aim of this analysis. 
+My motivation for working with this dataset stems from my love of food - I frequently cook for myself, and often when I want to try something new I use a recipe from a website like food.com. I've certainly cooked some un-reviewed recipes that I wasn't satisfied with before, though, despite how appetizing the picture looked (and I promise I'm a good cook!). Recounting these experiences caused me to wonder: what are the characteristics of a "good" recipe? Or, in other words, **can we predict the rating of a review based on characteristics of that review's recipe?** It would be useful to know which recipe characteristics predict good reviews, and to what degree these characteristics are able to predict this outcome. Such predictive abilities would allow us to have some insight on how a recipe might be reviewed in the future (and how it might taste in the present) even if no one has reviewed it yet. Creating a model that tries to make predictions about ratings in this fashion is the central aim of this analysis. 
 
- To accomplish this aims, I will first clean the dataset and perform some exploratory data analysis before framing my prediction problem more specifically, creating a baseline model, and improving upon this model to create a final model. In order to get us started, I will summarize some of the most relevant columns in the initial Recipes and Ratings dataset that I plan to use.
+ To accomplish these aims, I will first clean the dataset and perform some exploratory data analysis before framing my prediction problem more specifically, creating a baseline model, and improving upon this model to create a final model. In order to get us started, I will summarize some of the most relevant columns in the initial Recipes and Ratings dataset that I plan to use.
 
 |**Column**    | **Description** |
 | --- | --- | --- |
@@ -247,7 +247,7 @@ In terms of imputation, I did not replace any missing values.
 
 ## Framing a Prediction Problem
 
-This analysis is centered around the question: **can we predict a "good" recipe?** Making this into a more tangible prediction probelem requires defining what we mean by "good". A simple definition would be to just follow the rating system: great recipes are those that are rated as 5, good as 4, etc. Predicting a "good" recipe then just amounts to predicting which rating class a recipe will belong to and judging it based on that predicted class. This problem, therefore, can be interpreted as a **classification** problem, and more specifically a **multiclass classification problem**. The response variable is the rating, and we can evaluate our classification models in a variety of ways; mainly we can use accuracy, precision, and recall to describe the quality of the model. 
+This analysis is centered around the question: **can we predict a high rating?** This problem can be interpreted as a **classification** problem, and more specifically a **multiclass classification problem**. The response variable is the rating, and we can evaluate our classification models in a variety of ways; mainly we can use accuracy, precision, and recall to describe the quality of the model. 
 
 When making binary classification models, the resulting predictions can fall into one of four categories:
 
@@ -280,7 +280,9 @@ These categories only exist for binary classification models, but as we'll see i
 </head>
 
 $$\text{accuracy } = \frac{TP + TN}{TP + FP + FN + TN}$$
+
 $$\text{recall } = \frac{TP}{TP + FN}$$
+
 $$\text{precision } = \frac{TP}{TP + FP}$$
 
 Combining these three metrics will help us understand what the best possible model is.
@@ -289,7 +291,39 @@ Combining these three metrics will help us understand what the best possible mod
 
 ## Baseline Model
 
+### One Versus Rest Model
+
+The first model I will use for this prediction problem is a **one versus rest logistic regression model** in which there are five seperate logistic regression models created, each one being a binary logistic regression model for each rating category. More specifically, this model will contain five sub-models, the first predicting whether or not a review gives a recipe a rating of 1 or not, the second predicting whether or not a review gives a recipe a rating of 2, etc. Based on the exploratory data analysis above, I decided to use four features as predictors in this initial model: `'minutes'`, `'calories_number'`, `'total_fat_PDV'`, and `'sodium_PDV'`. I performed a train test split, using 75% of my data to train the model and the remaining 25% to test it. After model training, I computed the model accuracy, recall, and precision on the test data. Since this was a multi class classification model, I couldn't compute recall and precision directly; instead I averaged it over the 5 models. The model had these metrics:
+
+-**accuracy**: 0.7726
+-**average recall**: 0.2
+-**average precision**: 0.1525
+
+Despite having high accuracy, the model displayed poor average recall and precision. Since these are averages across the five models, this might indicate that the one versus rest classifier is severely over-fitting one sub model and underfitting the rest. We can see if this is the case by plotting a confusion matrix:
+
+<head>
+    <title>Confusion Matrix</title>
+</head>
+<body>
+    <h1>Confusion Matrix for Baseline One Vs Rest Model</h1>
+    <img src="assets\confusion_matrix_m1.png" alt="Confusion Matrix" width="600">
+</body>
+
+Per the confusion matrix, the one versus rest classifier is classifying everything as rated a 5! This is not entirely surprising given the extreme bias in 5 ratings as seen before. This underlying distribution might not be condusive to a good model; we might need to reframe the prediction question.
+
+### Binary Logistic Regression model
+
 ---
 
 ## Final Model
+
+### Standard Scaling
+
+### Dropping and adding features
+
+### TF-IDF 
+
+### Cross Validation
+
+## Conclusion
 
